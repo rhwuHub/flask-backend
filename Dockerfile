@@ -27,6 +27,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxext-dev \
     libxt-dev \
     libxi-dev \
+    libxft2 \
+    libxft-dev \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # 创建虚拟环境
