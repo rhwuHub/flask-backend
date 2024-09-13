@@ -10,9 +10,6 @@ WORKDIR /app
 # 复制 requirements.txt 文件到容器中
 COPY requirements.txt .
 
-# 使用 Python 3.11 的 pip 安装依赖
-RUN pip install --no-cache-dir -r requirements.txt
-
 # 更新并安装系统依赖，包括 Python 3.11 和必要的 OpenGL 库
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3.11 \
