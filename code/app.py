@@ -1,4 +1,6 @@
 # app.py
+import os
+
 from flask import Flask, request, jsonify
 import gmsh
 import paramiko
@@ -122,9 +124,11 @@ def sqrCirc():
     gmsh.option.setNumber("Mesh.CharacteristicLengthFactor", 0.8)
     gmsh.option.setNumber("Mesh.MshFileVersion", 2.2)
     gmsh.model.mesh.generate(2)
-
+    output_dir = "data"
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
     # 保存网格为 .msh 文件
-    gmsh.write("SqrCirc.msh")
+    gmsh.write(os.path.join(output_dir, "SqrCirc.msh"))
 
     # 终止 Gmsh
     gmsh.finalize()
