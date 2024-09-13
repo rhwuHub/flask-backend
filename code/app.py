@@ -1,6 +1,7 @@
 # app.py
 from flask import Flask, request, jsonify
 import gmsh
+import paramiko
 
 app = Flask(__name__)
 
@@ -123,6 +124,38 @@ def sqrCirc():
 # python ../../../utils/Gmsh/LibGmsh2Specfem_convert_Gmsh_to_Specfem2D_official.py SqrCirc -t F -b A -r A -l A将msh转换成specfem2d需要的网格文件
 # cd .. 返回run/gmshtest
 # 运行run_this_example.sh
+
+def login_operation():
+    # 配置连接参数
+    hostname = '139.9.220.169'  # 服务器地址
+    port = 22  # SSH 端口，通常是 22
+    username = 'root'  # SSH 用户名
+    password = 'Wuruihao5.'  # SSH 密码
+    remote_directory = '/path/to/new_directory'  # 远程服务器上要创建的文件夹路径
+
+    try:
+        # 创建 SSH 客户端对象
+        ssh = paramiko.SSHClient()
+
+        # 自动添加主机密钥
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+        # 连接到服务器
+        ssh.connect(hostname, port, username, password)
+
+        # 使用 SSH 连接执行命令
+        stdin, stdout, stderr = ssh.exec_command(f'mkdir -p {remote_directory}')
+
+        # 获取命令执行结果
+        error = stderr.read().decode()
+        if error:
+            print(f'Error: {error}')
+        else:
+            print(f'Folder created successfully at {remote_directory}')
+
+    finally:
+        # 关闭连接
+        ssh.close()
 
 
 if __name__ == '__main__':

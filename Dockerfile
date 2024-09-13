@@ -7,12 +7,14 @@ ENV DEBIAN_FRONTEND=noninteractive
 # 设置工作目录
 WORKDIR /app
 
-# 更新并安装系统依赖，包括 Python 3.11 和必要的 OpenGL 库
+# 复制 requirements.txt 文件到容器中
+COPY requirements.txt .
+
+# 使用 Python 3.11 的 pip 安装依赖
+RUN pip install --no-cache-dir -r requirements.txt
+
 # 更新并安装系统依赖，包括 Python 3.11 和必要的 OpenGL 库
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    software-properties-common \
-    && add-apt-repository ppa:deadsnakes/ppa \
-    && apt-get update && apt-get install -y --no-install-recommends \
     python3.11 \
     python3.11-venv \
     python3.11-dev \
@@ -21,14 +23,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# 创建 Python 3.11 的软链接
-RUN ln -sf /usr/bin/python3.11 /usr/bin/python && ln -sf /usr/bin/pip3 /usr/bin/pip
+# 创建虚拟环境
+RUN python3.11 -m venv /env
 
-# 复制 requirements.txt 文件到容器中
-COPY requirements.txt .
+# 激活虚拟环境并安装依赖
+RUN /env/bin/pip install --upgrade pip setuptools \
+    && /env/bin/pip install --no-cache-dir -r requirements.txt
 
-# 使用 Python 3.11 的 pip 安装依赖
-RUN pip install --no-cache-dir -r requirements.txt
+# 设置环境变量，确保使用虚拟环境中的 Python 和 pip
+ENV PATH="/env/bin:$PATH"
 
 # 复制代码文件到容器中
 COPY ./code .
