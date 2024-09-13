@@ -21,6 +21,7 @@ lc1 = 0.1
 
 factory = gmsh.model.geo
 
+
 # add a square
 factory.addPoint(length/2, width/2, 0, lc1, 1)
 factory.addPoint(length/2, -width/2, 0, lc1, 2)
