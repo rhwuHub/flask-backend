@@ -128,7 +128,7 @@ def sqrCirc():
 
 # 用python登录服务器，构建python脚本执行
 # python ../../../utils/Gmsh/LibGmsh2Specfem_convert_Gmsh_to_Specfem2D_official.py SqrCirc -t F -b A -r A -l A将msh转换成specfem2d需要的网格文件
-# cd .. 返回run/gmshtest
+# cd 返回run/gmshtest
 # 运行run_this_example.sh
 
 def login_operation():
@@ -151,6 +151,10 @@ def login_operation():
 
         # 使用 SSH 连接执行命令
         stdin, stdout, stderr = ssh.exec_command(f'mkdir -p {remote_directory}')
+        # 要执行的命令
+        command = 'python ../../../utils/Gmsh/LibGmsh2Specfem_convert_Gmsh_to_Specfem2D_official.py SqrCirc -t F -b A -r A -l A'
+        # 执行命令
+        stdin_sqr, stdout_sqr, stderr_sqr = ssh.exec_command(command)
 
         # 获取命令执行结果
         error = stderr.read().decode()
