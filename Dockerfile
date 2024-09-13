@@ -7,11 +7,11 @@ ENV DEBIAN_FRONTEND=noninteractive
 # 设置工作目录
 WORKDIR /app
 
-# 复制 requirements.txt 文件到容器中
-COPY requirements.txt .
-
 # 更新并安装系统依赖，包括 Python 3.11 和必要的 OpenGL 库
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    software-properties-common \
+    && add-apt-repository ppa:deadsnakes/ppa \
+    && apt-get update && apt-get install -y --no-install-recommends \
     python3.11 \
     python3.11-venv \
     python3.11-dev \
