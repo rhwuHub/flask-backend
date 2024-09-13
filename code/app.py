@@ -6,6 +6,11 @@ import paramiko
 app = Flask(__name__)
 
 
+# 在应用启动时初始化 Gmsh
+@app.before_first_request
+def initialize_gmsh():
+    gmsh.initialize()  # 在应用启动时初始化一次
+    print("Gmsh initialized")
 
 # 定义一个简单的 POST 接口
 @app.route('/test', methods=['POST'])
@@ -19,8 +24,6 @@ def test():
 
 
 def sqrCirc():
-    gmsh.initialize()
-
     gmsh.model.add("t4")
 
     cm = 1e-02
