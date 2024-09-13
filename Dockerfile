@@ -23,6 +23,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1 \
     libxrender1 \
     libxcursor1 \
+    libx11-dev \
+    libxext-dev \
+    libxt-dev \
+    libxi-dev \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # 创建虚拟环境
