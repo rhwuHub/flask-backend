@@ -17,8 +17,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3.11-dev \
     python3-pip \
     libglu1-mesa \
-    libgl1-mesa-glx \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    libgl1 \
+    && apt-get clean && rm -rf /var/lib/apt/lists/* \
 
 # 创建 Python 3.11 的软链接
 RUN ln -s /usr/bin/python3.11 /usr/bin/python && ln -s /usr/bin/pip3 /usr/bin/pip
