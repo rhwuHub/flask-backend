@@ -8,6 +8,9 @@ WORKDIR /app
 # 复制当前目录内容到容器中
 COPY ./code .
 
+# 复制 requirements.txt 文件到容器中
+COPY requirements.txt .
+
 # 安装依赖
 RUN pip install --no-cache-dir -r requirements.txt
 
