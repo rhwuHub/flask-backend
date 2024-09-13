@@ -6,7 +6,6 @@ Created on Tue Sep  3 23:32:02 2024
 """
 
 import gmsh
-import math
 
 gmsh.initialize()
 
