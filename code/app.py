@@ -6,12 +6,10 @@ import paramiko
 app = Flask(__name__)
 
 
-# 在应用启动时初始化 Gmsh
-# 使用 before_request 进行 Gmsh 的初始化
-@app.before_request
+# 初始化 GMSH 的方法
 def initialize_gmsh():
     if not gmsh.isInitialized():
-        gmsh.initialize()  # 在请求处理之前初始化 Gmsh
+        gmsh.initialize()  # 确保 GMSH 只在主线程中初始化
         print("Gmsh initialized")
 
 # 定义一个简单的 POST 接口
@@ -22,7 +20,12 @@ def test():
     # 返回接收到的数据，可以根据实际情况修改处理逻辑
     return jsonify({"received_data": data}), 200
 
-
+# 确保在应用退出时清理 GMSH
+@app.teardown_appcontext
+def finalize_gmsh(exception):
+    if gmsh.isInitialized():
+        gmsh.finalize()
+        print("Gmsh finalized")
 
 
 def sqrCirc():
@@ -164,4 +167,6 @@ def login_operation():
 
 
 if __name__ == '__main__':
+    if not gmsh.isInitialized():
+        initialize_gmsh()
     app.run(host='0.0.0.0', port=5000)
