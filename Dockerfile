@@ -21,6 +21,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-pip \
     libglu1-mesa \
     libgl1 \
+    libxrender1 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # 创建虚拟环境
