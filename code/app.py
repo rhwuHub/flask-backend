@@ -23,13 +23,6 @@ def test():
     # 返回接收到的数据，可以根据实际情况修改处理逻辑
     return jsonify({"received_data": data}), 200
 
-# 确保在应用退出时清理 GMSH
-@app.teardown_appcontext
-def finalize_gmsh(exception):
-    if gmsh.isInitialized():
-        gmsh.finalize()
-        print("Gmsh finalized")
-
 
 def sqrCirc():
     gmsh.model.add("t4")
@@ -131,7 +124,7 @@ def sqrCirc():
     gmsh.write(os.path.join(output_dir, "SqrCirc.msh"))
 
     # 终止 Gmsh
-    gmsh.finalize()
+    # gmsh.finalize()
 
 # 用python登录服务器，构建python脚本执行
 # python ../../../utils/Gmsh/LibGmsh2Specfem_convert_Gmsh_to_Specfem2D_official.py SqrCirc -t F -b A -r A -l A将msh转换成specfem2d需要的网格文件
