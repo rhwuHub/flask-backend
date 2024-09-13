@@ -7,10 +7,12 @@ app = Flask(__name__)
 
 
 # 在应用启动时初始化 Gmsh
-@app.before_first_request
+# 使用 before_request 进行 Gmsh 的初始化
+@app.before_request
 def initialize_gmsh():
-    gmsh.initialize()  # 在应用启动时初始化一次
-    print("Gmsh initialized")
+    if not gmsh.isInitialized():
+        gmsh.initialize()  # 在请求处理之前初始化 Gmsh
+        print("Gmsh initialized")
 
 # 定义一个简单的 POST 接口
 @app.route('/test', methods=['POST'])
