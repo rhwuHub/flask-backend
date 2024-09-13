@@ -127,10 +127,10 @@ def sqrCirc():
 
 def login_operation():
     # 配置连接参数
-    hostname = '139.9.220.169'  # 服务器地址
+    hostname = ''  # 服务器地址
     port = 22  # SSH 端口，通常是 22
     username = 'root'  # SSH 用户名
-    password = 'Wuruihao5.'  # SSH 密码
+    password = ''  # SSH 密码
     remote_directory = '/path/to/new_directory'  # 远程服务器上要创建的文件夹路径
 
     try:
