@@ -4,6 +4,7 @@ from flask import Flask, request, jsonify
 app = Flask(__name__)
 
 
+
 # 定义一个简单的 POST 接口
 @app.route('/test', methods=['POST'])
 def test():
