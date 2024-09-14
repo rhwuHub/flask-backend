@@ -152,7 +152,8 @@ def login_operation():
         return config
 
     # 读取配置文件
-    config = load_config('../config.txt')
+    # 本地运行使用../config.txt、docker部署使用/app/config.txt
+    config = load_config('/app/config.txt')
     # 使用配置文件中的信息连接 SSH
     hostname = config['hostname']
     port = int(config['port'])
