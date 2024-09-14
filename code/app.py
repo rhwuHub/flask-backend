@@ -160,24 +160,38 @@ def login_operation():
         ssh.connect(hostname, port, username, password)
 
         # 将生成的/root/project/flask-backend/data/SqrCirc 复制到/data/specfem2d/my-gmsh-data/data/gmshtest/MESH中
-        source_path = '/root/project/flask-backend/data/SqrCirc'
+        source_path = '/root/project/flask-backend/data/SqrCirc.msh'
         destination_path = '/data/specfem2d/my-gmsh-data/data/gmshtest/MESH'
-        cp_command = f'cp -r {source_path} {destination_path}'
+        cp_command = f'cp -rf {source_path} {destination_path}'
         stdin, stdout, stderr = ssh.exec_command(cp_command)
-        print('cp SqrCirc to MESH',stdout.read().decode())
-        print('cp SqrCirc to MESH',stderr.read().decode())
+        cp_stderr = stderr.read().decode()
+        if not cp_stderr:
+            print('Successfully copied SqrCirc to MESH')
+        else:
+            print('Failed to copy SqrCirc to MESH')
+            print('Error:', cp_stderr)
 
         # 要执行的命令,服务器需要安装好python和numpy
-        python_command  = 'python /data/specfem2d/utils/Gmsh/LibGmsh2Specfem_convert_Gmsh_to_Specfem2D_official.py /root/project/flask-backend/data/SqrCirc -t F -b A -r A -l A'
+        python_command  = 'cd /data/specfem2d/my-gmsh-data/data/gmshtest/MESH && python3 /data/specfem2d/utils/Gmsh/LibGmsh2Specfem_convert_Gmsh_to_Specfem2D_official.py SqrCirc -t F -b A -r A -l A'
         stdin, stdout, stderr = ssh.exec_command(python_command)
-        print('Python script stdout:', stdout.read().decode())
-        print('Python script stderr:', stderr.read().decode())
+        python_stderr = stderr.read().decode()
+
+        if not python_stderr:
+            print('Python script executed successfully')
+        else:
+            print('Python script execution failed')
+            print('Error:', python_stderr)
 
         # 执行run_this_example.sh脚本
-        sh_command = './data/specfem2d/my-gmsh-data/data/gmshtest/run_this_example.sh'
+        sh_command = 'cd /data/specfem2d/my-gmsh-data/data/gmshtest && ./run_this_example.sh'
         stdin, stdout, stderr = ssh.exec_command(sh_command)
-        print('Shell script stdout:', stdout.read().decode())
-        print('Shell script stderr:', stderr.read().decode())
+        sh_stderr = stderr.read().decode()
+
+        if not sh_stderr:
+            print('Shell script executed successfully')
+        else:
+            print('Shell script execution failed')
+            print('Error:', sh_stderr)
 
         # 获取命令执行结果
         error = stderr.read().decode()
@@ -192,6 +206,7 @@ def login_operation():
 
 
 if __name__ == '__main__':
-    if not gmsh.isInitialized():
-        initialize_gmsh()
-    app.run(host='0.0.0.0', port=5000)
+    login_operation()
+    # if not gmsh.isInitialized():
+    #     initialize_gmsh()
+    # app.run(host='0.0.0.0', port=5000)
