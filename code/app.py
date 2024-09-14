@@ -1,7 +1,7 @@
 # app.py
 import os
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 import gmsh
 import paramiko
 
@@ -24,6 +24,15 @@ def test():
     # 返回接收到的数据，可以根据实际情况修改处理逻辑
     return jsonify({"received_data": data}), 200
 
+
+@app.route('/download')
+def download_file():
+    try:
+        # 远程文件路径
+        file_path = '/data/op.zip'
+        return send_file(file_path, as_attachment=True)
+    except Exception as e:
+        return str(e)
 
 def sqrCirc():
     gmsh.model.add("t4")
@@ -193,6 +202,8 @@ def login_operation():
             print('Shell script execution failed')
             print('Error:', sh_stderr)
 
+        # 将OUTPUT_FILES压缩
+
         # 获取命令执行结果
         error = stderr.read().decode()
         if error:
@@ -200,13 +211,13 @@ def login_operation():
         else:
             print(f'Shell script stderr successfully at run_this_example')
 
+
     finally:
         # 关闭连接
         ssh.close()
 
 
 if __name__ == '__main__':
-    login_operation()
-    # if not gmsh.isInitialized():
-    #     initialize_gmsh()
-    # app.run(host='0.0.0.0', port=5000)
+    if not gmsh.isInitialized():
+        initialize_gmsh()
+    app.run(host='0.0.0.0', port=5000)
