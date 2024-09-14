@@ -181,8 +181,6 @@ def login_operation():
 
         # 获取命令执行结果
         error = stderr.read().decode()
-        # 关闭 SSH 连接
-        ssh.close()
         if error:
             print(f'Error: {error}')
         else:
