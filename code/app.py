@@ -158,6 +158,14 @@ def login_operation():
         # 连接到服务器
         ssh.connect(hostname, port, username, password)
 
+        # 将生成的/root/project/flask-backend/data/SqrCirc 复制到/data/specfem2d/my-gmsh-data/data/gmshtest/MESH中
+        source_path = '/root/project/flask-backend/data/SqrCirc'
+        destination_path = '/data/specfem2d/my-gmsh-data/data/gmshtest/MESH'
+        cp_command = f'cp -r {source_path} {destination_path}'
+        stdin, stdout, stderr = ssh.exec_command(cp_command)
+        print('cp SqrCirc to MESH',stdout.read().decode())
+        print('cp SqrCirc to MESH',stderr.read().decode())
+
         # 要执行的命令,服务器需要安装好python和numpy
         python_command  = 'python /data/specfem2d/utils/Gmsh/LibGmsh2Specfem_convert_Gmsh_to_Specfem2D_official.py /root/project/flask-backend/data/SqrCirc -t F -b A -r A -l A'
         stdin, stdout, stderr = ssh.exec_command(python_command)
