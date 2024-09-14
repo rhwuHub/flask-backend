@@ -20,6 +20,7 @@ def initialize_gmsh():
 def test():
     data = request.json
     sqrCirc()
+    login_operation()
     # 返回接收到的数据，可以根据实际情况修改处理逻辑
     return jsonify({"received_data": data}), 200
 
