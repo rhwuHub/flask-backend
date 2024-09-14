@@ -15,6 +15,7 @@ def initialize_gmsh():
         gmsh.initialize()  # 确保 GMSH 只在主线程中初始化
         print("Gmsh initialized")
 
+
 # 定义一个简单的 POST 接口
 @app.route('/test', methods=['POST'])
 def test():
