@@ -132,12 +132,21 @@ def sqrCirc():
 # 运行run_this_example.sh
 
 def login_operation():
-    # 配置连接参数
-    hostname = ''  # 服务器地址
-    port = 22  # SSH 端口，通常是 22
-    username = 'root'  # SSH 用户名
-    password = ''  # SSH 密码
-    remote_directory = '/path/to/new_directory'  # 远程服务器上要创建的文件夹路径
+    def load_config(filename):
+        config = {}
+        with open(filename, 'r') as file:
+            for line in file:
+                key, value = line.strip().split('=', 1)
+                config[key] = value
+        return config
+
+    # 读取配置文件
+    config = load_config('../config.txt')
+    # 使用配置文件中的信息连接 SSH
+    hostname = config['hostname']
+    port = int(config['port'])
+    username = config['username']
+    password = config['password']
 
     try:
         # 创建 SSH 客户端对象
@@ -149,19 +158,26 @@ def login_operation():
         # 连接到服务器
         ssh.connect(hostname, port, username, password)
 
-        # 使用 SSH 连接执行命令
-        stdin, stdout, stderr = ssh.exec_command(f'mkdir -p {remote_directory}')
-        # 要执行的命令
-        command = 'python ../../../utils/Gmsh/LibGmsh2Specfem_convert_Gmsh_to_Specfem2D_official.py SqrCirc -t F -b A -r A -l A'
-        # 执行命令
-        stdin_sqr, stdout_sqr, stderr_sqr = ssh.exec_command(command)
+        # 要执行的命令,服务器需要安装好python和numpy
+        python_command  = 'python /data/specfem2d/utils/Gmsh/LibGmsh2Specfem_convert_Gmsh_to_Specfem2D_official.py /root/project/flask-backend/data/SqrCirc -t F -b A -r A -l A'
+        stdin, stdout, stderr = ssh.exec_command(python_command)
+        print('Python script stdout:', stdout.read().decode())
+        print('Python script stderr:', stderr.read().decode())
+
+        # 执行run_this_example.sh脚本
+        sh_command = './data/specfem2d/my-gmsh-data/data/gmshtest/run_this_example.sh'
+        stdin, stdout, stderr = ssh.exec_command(sh_command)
+        print('Shell script stdout:', stdout.read().decode())
+        print('Shell script stderr:', stderr.read().decode())
 
         # 获取命令执行结果
         error = stderr.read().decode()
+        # 关闭 SSH 连接
+        ssh.close()
         if error:
             print(f'Error: {error}')
         else:
-            print(f'Folder created successfully at {remote_directory}')
+            print(f'Shell script stderr successfully at run_this_example')
 
     finally:
         # 关闭连接
