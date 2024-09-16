@@ -15,11 +15,15 @@ def initialize_gmsh():
         logging.info("Gmsh initialized")
 
 # 从文件加载配置
+# 从文件加载配置
 def load_config(filename):
     config = {}
     try:
         with open(filename, 'r') as file:
             for line in file:
+                # 忽略以 # 开头的注释行
+                if line.strip().startswith("#") or not line.strip():
+                    continue
                 key, value = line.strip().split('=', 1)
                 config[key] = value
     except FileNotFoundError as e:
