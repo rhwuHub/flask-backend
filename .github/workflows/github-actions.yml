@@ -3,7 +3,7 @@ name: Build and Push Docker Image to Aliyun
 on:
   push:
     branches:
-      - gm  # 当 gm 分支有代码推送时触发
+      - gm-update  # 当 gm-update 分支有代码推送时触发
 
 jobs:
   build-and-push:
