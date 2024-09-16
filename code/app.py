@@ -53,18 +53,19 @@ def login_operation():
         )
 
         # 复制 SqrCirc.msh 文件
-        source_path = '/root/project/flask-backend/data/SqrCirc.msh'
-        destination_path = '/data/specfem2d/my-gmsh-data/data/gmshtest/MESH'
-        copy_command = f'cp -rf {source_path} {destination_path}'
+        source_path = config['SqrCirc_PATH']
+        destination_path = config['GMSHTEST_PATH']
+        copy_command = f'cp -rf {source_path} {destination_path}/MESH'
         if execute_ssh_command(ssh, copy_command):
             logging.info('成功将 SqrCirc 复制到 MESH 目录')
         else:
             logging.error('复制 SqrCirc 到 MESH 失败')
 
+        LibGmsh2Specfem_PATH = config['LibGmsh2Specfem_PATH']
         # 执行 Python 脚本
         python_command = (
-            'cd /data/specfem2d/my-gmsh-data/data/gmshtest/MESH && '
-            'python3 /data/specfem2d/utils/Gmsh/LibGmsh2Specfem_convert_Gmsh_to_Specfem2D_official.py '
+            f'cd {destination_path}/MESH && '
+            f'python3 {LibGmsh2Specfem_PATH}/LibGmsh2Specfem_convert_Gmsh_to_Specfem2D_official.py '
             'SqrCirc -t F -b A -r A -l A'
         )
         if execute_ssh_command(ssh, python_command):
@@ -73,7 +74,7 @@ def login_operation():
             logging.error('Python 脚本执行失败')
 
         # 执行 Shell 脚本
-        shell_command = 'cd /data/specfem2d/my-gmsh-data/data/gmshtest && ./run_this_example.sh'
+        shell_command = f'cd {destination_path} && ./run_this_example.sh'
         if execute_ssh_command(ssh, shell_command):
             logging.info('Shell 脚本执行成功')
         else:
@@ -83,7 +84,7 @@ def login_operation():
         ssh.close()
 
 # 定义一个简单的 POST 接口
-@app.route('/test', methods=['POST'])
+@app.route('/test_update', methods=['POST'])
 def test():
     data = request.json
     initialize_gmsh()
