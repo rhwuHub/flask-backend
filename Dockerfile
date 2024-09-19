@@ -33,6 +33,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgomp1 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# 配置安装specfem2D
+
+
 # 创建虚拟环境
 RUN python3.11 -m venv /env
 
