@@ -40,7 +40,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # 配置安装specfem2D
 # 克隆 Specfem2D 的最新 devel 分支代码
-RUN git clone --recursive --branch devel https://github.com/geodynamics/specfem2d.git /app/specfem2d
+RUN git clone --recursive --branch devel https://github.com/geodynamics/specfem2d.git
 
 # 配置安装 Specfem2D
 WORKDIR /app/specfem2d
