@@ -1,8 +1,12 @@
 import paramiko
 import logging
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 import gmsh
+import mesh_generator
 import os
+import re
+from PIL import Image
+import imageio
 app = Flask(__name__)
 
 # 设置日志
@@ -19,7 +23,7 @@ def initialize_gmsh():
 def load_config(filename):
     config = {}
     try:
-        with open(filename, 'r') as file:
+        with open(filename, 'r',encoding='utf-8') as file:
             for line in file:
                 # 忽略以 # 开头的注释行
                 if line.strip().startswith("#") or not line.strip():
@@ -42,7 +46,7 @@ def execute_ssh_command(ssh, command):
 
 # 登录并执行所需操作
 def login_operation():
-    config_file = '/app/config.txt'  # 根据环境（docker/本地）调整路径
+    config_file = '../config.txt'  # 根据环境（docker/本地）调整路径
     config = load_config(config_file)
 
     ssh = paramiko.SSHClient()
@@ -59,6 +63,7 @@ def login_operation():
 
         # 复制 SqrCirc.msh 文件
         source_path = config['SqrCirc_PATH']
+        # gmshtest目录
         destination_path = config['GMSHTEST_PATH']
         copy_command = f'cp -rf {source_path} {destination_path}/MESH'
         if execute_ssh_command(ssh, copy_command):
@@ -85,107 +90,57 @@ def login_operation():
         else:
             logging.error('Shell 脚本执行失败')
 
+        #     生成gif
+        create_gif_from_images('/app/OUTPUT_FILES','/app/OUTPUT_FILES/output.gif')
+        logging.info('生成Gif成功')
     finally:
         ssh.close()
 
 def sqrCirc():
-    gmsh.model.add("t4")
+    mesh_generator.generate_circle_mesh()
+    # mesh_generator.generate_ellipse_mesh()
 
-    cm = 1e-02
 
-    # 定义矩形的尺寸
-    length = 2.0
-    width = 2.0
-    lc1 = 0.1
 
-    factory = gmsh.model.geo
 
-    # add a square
-    factory.addPoint(length / 2, width / 2, 0, lc1, 1)
-    factory.addPoint(length / 2, -width / 2, 0, lc1, 2)
-    factory.addPoint(-length / 2, -width / 2, 0, lc1, 3)
-    factory.addPoint(-length / 2, width / 2, 0, lc1, 4)
+# 调用方法的示例：将图片生成gif
+# create_gif_from_images('/data/picture', '/data/picture/output.gif')
+def create_gif_from_images(image_dir, output_gif):
+    """
+    将指定目录中的所有 .jpg 文件按照文件名中的数字顺序合并为一个 GIF 动图。
 
-    factory.addLine(1, 4, 1)
-    factory.addLine(4, 3, 2)
-    factory.addLine(3, 2, 3)
-    factory.addLine(2, 1, 4)
+    参数:
+    - image_dir: 包含原图片的文件夹路径。
+    - output_gif: 生成的 GIF 文件的保存路径。
 
-    factory.addCurveLoop([1, 2, 3, 4], 10)
-    # factory.addPlaneSurface([1], 1)
+    返回:
+    - None
+    """
+    # 获取目录中所有的 .jpg 文件
+    jpg_files = [f for f in os.listdir(image_dir) if f.endswith('.jpg')]
 
-    # add a big circle
-    R = 0.2
-    Centx = 0.25
-    Centy = 0
-    factory.addPoint(Centx, R + Centy, 0, lc1, 5)
-    factory.addPoint(R + Centx, Centy, 0, lc1, 6)
-    factory.addPoint(-R + Centx, Centy, 0, lc1, 7)
-    factory.addPoint(Centx, -R + Centy, 0, lc1, 8)
-    factory.addPoint(Centx, Centy, 0, lc1, 9)
-    factory.addCircleArc(5, 9, 7, 5)
-    factory.addCircleArc(7, 9, 8, 6)
-    factory.addCircleArc(8, 9, 6, 7)
-    factory.addCircleArc(6, 9, 5, 8)
-    factory.addCurveLoop([5, 6, 7, 8], 9)
+    # 使用正则表达式提取文件名中的数字，并按升序排序
+    def get_image_number(filename):
+        match = re.search(r'forward_image(\d+).jpg', filename)
+        return int(match.group(1)) if match else -1
 
-    # add a small circle
-    R = 0.1
-    Centx = -0.25
-    Centy = 0
-    factory.addPoint(Centx, R + Centy, 0, lc1, 105)
-    factory.addPoint(R + Centx, Centy, 0, lc1, 106)
-    factory.addPoint(-R + Centx, Centy, 0, lc1, 107)
-    factory.addPoint(Centx, -R + Centy, 0, lc1, 108)
-    factory.addPoint(Centx, Centy, 0, lc1, 109)
-    factory.addCircleArc(105, 109, 107, 105)
-    factory.addCircleArc(107, 109, 108, 106)
-    factory.addCircleArc(108, 109, 106, 107)
-    factory.addCircleArc(106, 109, 105, 108)
-    factory.addCurveLoop([105, 106, 107, 108], 109)
+    sorted_jpg_files = sorted(jpg_files, key=get_image_number)
 
-    factory.addPlaneSurface([10, 9, 109], 10)
-    factory.addPlaneSurface([9], 11)
-    factory.addPlaneSurface([109], 12)
+    # 读取所有图片
+    images = []
+    for file_name in sorted_jpg_files:
+        file_path = os.path.join(image_dir, file_name)
+        img = Image.open(file_path)
+        images.append(img)
 
-    factory.synchronize()
+    # 将图片保存为 GIF
+    if images:
+        images[0].save(output_gif, save_all=True, append_images=images[1:], duration=500, loop=0)
+        print(f"GIF 动图已成功生成并保存在: {output_gif}")
+    else:
+        print("未找到任何 .jpg 图片。")
 
-    # 创建物理组
-    # 1. 矩形区域的物理组，包括整个矩形区域
 
-    top_physical_group = gmsh.model.addPhysicalGroup(1, [1])
-    gmsh.model.setPhysicalName(1, top_physical_group, "Top")
-
-    left_physical_group = gmsh.model.addPhysicalGroup(1, [2])
-    gmsh.model.setPhysicalName(1, left_physical_group, "Left")
-
-    right_physical_group = gmsh.model.addPhysicalGroup(1, [4])
-    gmsh.model.setPhysicalName(1, right_physical_group, "Right")
-
-    bottom_physical_group = gmsh.model.addPhysicalGroup(1, [3])
-    gmsh.model.setPhysicalName(1, bottom_physical_group, "Bottom")
-
-    # 2. 圆形区域的物理组，实际上为圆形内的单元指定不同的属性
-    circle_physical_group = gmsh.model.addPhysicalGroup(2, [10])
-    gmsh.model.setPhysicalName(2, circle_physical_group, "M1")
-
-    sc_physical_group = gmsh.model.addPhysicalGroup(2, [11, 12])
-    gmsh.model.setPhysicalName(2, sc_physical_group, "M2")
-
-    # 生成四边形网格
-    gmsh.option.setNumber("Mesh.Algorithm", 8)  # 使用四边形网格生成算法
-    # gmsh.option.setNumber("Mesh.RecombineAll", 1)  # 强制使用四边形网格
-    gmsh.option.setNumber("Mesh.ElementOrder", 2)  # 使用一阶网格
-    gmsh.option.setNumber("Mesh.SubdivisionAlgorithm", 1)
-    gmsh.option.setNumber("Mesh.RecombinationAlgorithm", 2)
-    gmsh.option.setNumber("Mesh.CharacteristicLengthFactor", 0.8)
-    gmsh.option.setNumber("Mesh.MshFileVersion", 2.2)
-    gmsh.model.mesh.generate(2)
-    output_dir = "data"
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-    # 保存网格为 .msh 文件
-    gmsh.write(os.path.join(output_dir, "SqrCirc.msh"))
 
 
 # 定义一个简单的 POST 接口
@@ -195,6 +150,21 @@ def test():
     sqrCirc()
     login_operation()
     return jsonify({"received_data": data}), 200
+
+
+# 定义一个路由来发送图片文件
+@app.route('/get_image/<filename>', methods=['GET'])
+def get_image(filename):
+    # 确保图片存在于文件夹中
+    image_path = os.path.join('IMAGE_FOLDER', filename)
+
+    if os.path.exists(image_path):
+        # 发送图片文件到前端
+        return send_file(image_path, mimetype='image/jpeg')  # 可以根据图片类型设置 MIME 类型
+    else:
+        # 如果文件不存在，返回错误信息
+        return jsonify({"error": "File not found"}), 404
+
 
 if __name__ == '__main__':
     if not gmsh.isInitialized():
