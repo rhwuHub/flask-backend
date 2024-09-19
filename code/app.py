@@ -155,11 +155,11 @@ def test():
 @app.route('/get_image/<filename>', methods=['GET'])
 def get_image(filename):
     # 确保图片存在于文件夹中
-    image_path = os.path.join('IMAGE_FOLDER', filename)
+    image_path = os.path.join('/app/OUTPUT_FILES', filename)
 
     if os.path.exists(image_path):
         # 发送图片文件到前端
-        return send_file(image_path, mimetype='image/jpeg')  # 可以根据图片类型设置 MIME 类型
+        return send_file(image_path, mimetype='image/gif')  # 可以根据图片类型设置 MIME 类型
     else:
         # 如果文件不存在，返回错误信息
         return jsonify({"error": "File not found"}), 404
