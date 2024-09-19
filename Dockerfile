@@ -33,6 +33,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgomp1 \
     git \
     gcc \
+    g++ \
     gfortran \
     openmpi-bin \
     libopenmpi-dev \
