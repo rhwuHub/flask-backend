@@ -37,6 +37,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gfortran \
     openmpi-bin \
     libopenmpi-dev \
+    make \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # 配置安装specfem2D
