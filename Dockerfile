@@ -31,10 +31,26 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxft-dev \
     libxinerama1 \
     libgomp1 \
+    git \
+    gcc \
+    gfortran \
+    openmpi-bin \
+    libopenmpi-dev \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # 配置安装specfem2D
+# 克隆 Specfem2D 的最新 devel 分支代码
+RUN git clone --recursive --branch devel https://github.com/geodynamics/specfem2d.git /app/specfem2d
 
+# 配置安装 Specfem2D
+WORKDIR /app/specfem2d
+RUN ./configure FC=gfortran CC=gcc MPIFC=mpif90 --with-mpi
+
+# 安装 Specfem2D
+RUN make
+
+# 返回到 /app 目录
+WORKDIR /app
 
 # 创建虚拟环境
 RUN python3.11 -m venv /env
