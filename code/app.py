@@ -6,7 +6,6 @@ import mesh_generator
 import os
 import re
 from PIL import Image
-import imageio
 app = Flask(__name__)
 
 # 设置日志

@@ -2,3 +2,4 @@
 flask
 gmsh
 paramiko
+Pillow
