@@ -6,6 +6,7 @@ import mesh_generator
 import os
 import re
 from PIL import Image
+import subprocess
 app = Flask(__name__)
 
 # 设置日志
@@ -34,66 +35,45 @@ def load_config(filename):
         raise
     return config
 
-# 执行SSH命令的通用函数
-def execute_ssh_command(ssh, command):
-    stdin, stdout, stderr = ssh.exec_command(command)
-    stderr_output = stderr.read().decode().strip()
-    if stderr_output:
-        logging.error(f"执行命令失败: {command}\n错误: {stderr_output}")
-        return False
-    return True
+# 执行linux命令
+def execute_command(command):
+    """
+    执行给定的 Linux 命令。
+
+    参数:
+    command (str): 要执行的命令行字符串。
+    """
+    try:
+        # 使用 subprocess.run 执行命令
+        subprocess.run(command, shell=True, check=True)
+        print(f"命令 '{command}' 执行成功。")
+    except subprocess.CalledProcessError as e:
+        print(f"执行命令时出错: {e}")
 
 # 登录并执行所需操作
-def login_operation():
+def container_operation():
     config_file = '/app/config.txt'  # 根据环境（docker/本地）调整路径
     config = load_config(config_file)
-
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-
-    try:
-        # 连接到服务器
-        ssh.connect(
-            hostname=config['hostname'],
-            port=int(config['port']),
-            username=config['username'],
-            password=config['password']
-        )
-
-        # 复制 SqrCirc.msh 文件
-        source_path = config['SqrCirc_PATH']
-        # gmshtest目录
-        destination_path = config['GMSHTEST_PATH']
-        copy_command = f'cp -rf {source_path} {destination_path}/MESH'
-        if execute_ssh_command(ssh, copy_command):
-            logging.info('成功将 SqrCirc 复制到 MESH 目录')
-        else:
-            logging.error('复制 SqrCirc 到 MESH 失败')
-
-        LibGmsh2Specfem_PATH = config['LibGmsh2Specfem_PATH']
-        # 执行 Python 脚本
-        python_command = (
-            f'cd {destination_path}/MESH && '
-            f'python3 {LibGmsh2Specfem_PATH}/LibGmsh2Specfem_convert_Gmsh_to_Specfem2D_official.py '
-            'SqrCirc -t F -b A -r A -l A'
-        )
-        if execute_ssh_command(ssh, python_command):
-            logging.info('Python 脚本执行成功')
-        else:
-            logging.error('Python 脚本执行失败')
-
-        # 执行 Shell 脚本
-        shell_command = f'cd {destination_path} && ./run_this_example.sh'
-        if execute_ssh_command(ssh, shell_command):
-            logging.info('Shell 脚本执行成功')
-        else:
-            logging.error('Shell 脚本执行失败')
-
-        #     生成gif
-        create_gif_from_images('/app/OUTPUT_FILES','/app/OUTPUT_FILES/output.gif')
-        logging.info('生成Gif成功')
-    finally:
-        ssh.close()
+    # 复制 SqrCirc.msh 文件 到 MESH 中
+    SqrCirc_PATH = config['SqrCirc_PATH']
+    GMSHTEST_PATH = config['GMSHTEST_PATH']
+    copy_command = f'cp -rf {SqrCirc_PATH} {GMSHTEST_PATH}/MESH'
+    execute_command(copy_command)
+    # 生成网格文件
+    LibGmsh2Specfem_PATH = config['LibGmsh2Specfem_PATH']
+    # 执行 Python 脚本
+    python_command = (
+        f'cd {GMSHTEST_PATH}/MESH && '
+        f'python3 {LibGmsh2Specfem_PATH}/LibGmsh2Specfem_convert_Gmsh_to_Specfem2D_official.py '
+        'SqrCirc -t F -b A -r A -l A'
+    )
+    execute_command(python_command)
+    # 执行 Shell 脚本 生成 jpg和semp文件
+    shell_command = f'cd {GMSHTEST_PATH} && ./run_this_example.sh'
+    execute_command(shell_command)
+    # 生成gif
+    create_gif_from_images(f'{GMSHTEST_PATH}/OUTPUT_FILES',f'{GMSHTEST_PATH}/OUTPUT_FILES/output.gif')
+    logging.info('生成Gif成功')
 
 def sqrCirc():
     mesh_generator.generate_circle_mesh()
@@ -150,7 +130,7 @@ def create_gif_from_images(image_dir, output_gif,max_size=(800,800)):
 def test():
     data = request.json
     sqrCirc()
-    login_operation()
+    container_operation()
     return jsonify({"received_data": data}), 200
 
 
@@ -158,7 +138,7 @@ def test():
 @app.route('/get_image/<filename>', methods=['GET'])
 def get_image(filename):
     # 确保图片存在于文件夹中
-    image_path = os.path.join('/app/OUTPUT_FILES', filename)
+    image_path = os.path.join('/app/gmshtest/OUTPUT_FILES', filename)
 
     if os.path.exists(image_path):
         # 发送图片文件到前端

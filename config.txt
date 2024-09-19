@@ -1,10 +1,6 @@
-hostname=139.9.220.169
-port=22
-username=root
-password=Wuruihao5.
 # SqrCirc.msh 的位置
-SqrCirc_PATH=/root/project/flask-backend/data/SqrCirc.msh
+SqrCirc_PATH=/app/data/SqrCirc.msh
 # gmshtest目录的位置
-GMSHTEST_PATH=/data/specfem2d/my-gmsh-data/data/gmshtest
+GMSHTEST_PATH=/app/gmshtest
 # LibGmsh2Specfem_convert_Gmsh_to_Specfem2D_official.py的位置
-LibGmsh2Specfem_PATH=/data/specfem2d/utils/Gmsh
+LibGmsh2Specfem_PATH=/app/specfem2d/utils/Gmsh

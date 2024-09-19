@@ -3,3 +3,4 @@ flask
 gmsh
 paramiko
 Pillow
+numpy

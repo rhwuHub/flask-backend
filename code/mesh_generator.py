@@ -204,7 +204,7 @@ def generate_circle_mesh(output_filename="SqrCirc.msh"):
     output_dir = "data"
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    # 保存网格为 .msh 文件
+    # 保存网格为 .msh 文件   /app/data/SqrCirc.msh
     gmsh.write(os.path.join(output_dir, output_filename))
     # 终止 Gmsh
     gmsh.finalize()
