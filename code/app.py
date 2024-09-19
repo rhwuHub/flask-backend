@@ -45,7 +45,7 @@ def execute_ssh_command(ssh, command):
 
 # 登录并执行所需操作
 def login_operation():
-    config_file = '../config.txt'  # 根据环境（docker/本地）调整路径
+    config_file = '/app/config.txt'  # 根据环境（docker/本地）调整路径
     config = load_config(config_file)
 
     ssh = paramiko.SSHClient()
@@ -104,7 +104,7 @@ def sqrCirc():
 
 # 调用方法的示例：将图片生成gif
 # create_gif_from_images('/data/picture', '/data/picture/output.gif')
-def create_gif_from_images(image_dir, output_gif):
+def create_gif_from_images(image_dir, output_gif,max_size=(800,800)):
     """
     将指定目录中的所有 .jpg 文件按照文件名中的数字顺序合并为一个 GIF 动图。
 
@@ -124,12 +124,15 @@ def create_gif_from_images(image_dir, output_gif):
         return int(match.group(1)) if match else -1
 
     sorted_jpg_files = sorted(jpg_files, key=get_image_number)
-
-    # 读取所有图片
+    # 读取所有图片并进行压缩
     images = []
     for file_name in sorted_jpg_files:
         file_path = os.path.join(image_dir, file_name)
         img = Image.open(file_path)
+
+        # 如果图片的尺寸超过 max_size，则压缩图片
+        img.thumbnail(max_size)
+
         images.append(img)
 
     # 将图片保存为 GIF
@@ -137,7 +140,7 @@ def create_gif_from_images(image_dir, output_gif):
         images[0].save(output_gif, save_all=True, append_images=images[1:], duration=500, loop=0)
         print(f"GIF 动图已成功生成并保存在: {output_gif}")
     else:
-        print("未找到任何 .jpg 图片。")
+        print("未找到任何 .jpg 图片")
 
 
 
