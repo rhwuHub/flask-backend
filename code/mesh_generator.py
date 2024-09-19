@@ -100,7 +100,7 @@ def generate_ellipse_mesh(output_filename="SqrCirc.msh"):
     gmsh.option.setNumber("Mesh.MshFileVersion", 2.2)
     # 表示生成二维网格
     gmsh.model.mesh.generate(2)
-    output_dir = "data"
+    output_dir = "gmshtest/MESH"
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     # 保存网格为 .msh 文件

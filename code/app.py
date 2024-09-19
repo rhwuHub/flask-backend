@@ -56,7 +56,7 @@ def container_operation():
     # 复制 SqrCirc.msh 文件 到 MESH 中
     GMSHTEST_PATH = config['GMSHTEST_PATH']
     # 生成网格文件
-    LibGmsh2Specfem_PATH = config['LibGmsh2Specfem_PATH']
+    LibGmsh2Specfem_PATH = '/app/specfem2d/utils/Gmsh'
     # 执行 Python 脚本
     python_command = (
         f'cd {GMSHTEST_PATH}/MESH && '
