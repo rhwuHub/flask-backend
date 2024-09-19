@@ -1,6 +1,5 @@
 # requirements.txt
 flask
 gmsh
-paramiko
 Pillow
 numpy

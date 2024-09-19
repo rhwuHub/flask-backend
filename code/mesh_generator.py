@@ -201,10 +201,10 @@ def generate_circle_mesh(output_filename="SqrCirc.msh"):
     gmsh.option.setNumber("Mesh.CharacteristicLengthFactor", 0.8)
     gmsh.option.setNumber("Mesh.MshFileVersion", 2.2)
     gmsh.model.mesh.generate(2)
-    output_dir = "data"
+    output_dir = "gmshtest/MESH"
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    # 保存网格为 .msh 文件   /app/data/SqrCirc.msh
+    # 保存网格为 .msh 文件   /app/gmshtest/MESH/SqrCirc.msh
     gmsh.write(os.path.join(output_dir, output_filename))
     # 终止 Gmsh
     gmsh.finalize()

@@ -1,4 +1,3 @@
-import paramiko
 import logging
 from flask import Flask, request, jsonify, send_file
 import gmsh
@@ -55,10 +54,7 @@ def container_operation():
     config_file = '/app/config.txt'  # 根据环境（docker/本地）调整路径
     config = load_config(config_file)
     # 复制 SqrCirc.msh 文件 到 MESH 中
-    SqrCirc_PATH = config['SqrCirc_PATH']
     GMSHTEST_PATH = config['GMSHTEST_PATH']
-    copy_command = f'cp -rf {SqrCirc_PATH} {GMSHTEST_PATH}/MESH'
-    execute_command(copy_command)
     # 生成网格文件
     LibGmsh2Specfem_PATH = config['LibGmsh2Specfem_PATH']
     # 执行 Python 脚本
