@@ -137,11 +137,17 @@ def generate_circle_mesh(output_filename="SqrCirc.msh"):
     R = 0.2
     Centx = 0.25
     Centy = 0
+    # 点5，位于圆的顶部
     factory.addPoint(Centx, R + Centy, 0, lc1, 5)
+    # 点6，位于圆的右侧
     factory.addPoint(R + Centx, Centy, 0, lc1, 6)
+    # 点7，位于圆的左侧
     factory.addPoint(-R + Centx, Centy, 0, lc1, 7)
+    # 点8，位于圆的底部
     factory.addPoint(Centx, -R + Centy, 0, lc1, 8)
+    # 圆心点9
     factory.addPoint(Centx, Centy, 0, lc1, 9)
+    # 进行连接点，形成圆弧
     factory.addCircleArc(5, 9, 7, 5)
     factory.addCircleArc(7, 9, 8, 6)
     factory.addCircleArc(8, 9, 6, 7)
