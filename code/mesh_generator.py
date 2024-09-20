@@ -43,12 +43,12 @@ def generate_ellipse_mesh(output_filename="SqrCirc.msh"):
     factory.addPoint(Centx, Centy, 0, lc1, 9)  # 中心点
 
     # 添加椭圆弧
-    factory.addEllipseArc(6, 9, 5, 5,201)  # 从右顶点到上顶点
-    factory.addEllipseArc(5, 9, 8, 8,202)  # 从上顶点到左顶点
-    factory.addEllipseArc(8, 9, 7, 7,203)  # 从左顶点到下顶点
-    factory.addEllipseArc(7, 9, 6, 6,204)  # 从下顶点到右顶点
+    factory.addEllipseArc(6, 9, 5, 5,5)  # 从右顶点到上顶点
+    factory.addEllipseArc(5, 9, 8, 8,6)  # 从上顶点到左顶点
+    factory.addEllipseArc(8, 9, 7, 7,7)  # 从左顶点到下顶点
+    factory.addEllipseArc(7, 9, 6, 6,8)  # 从下顶点到右顶点
 
-    factory.addCurveLoop([201, 202, 203, 204], 210)
+    factory.addCurveLoop([5, 6, 7, 8], 9)
 
     # 添加小椭圆
     Rx = 0.15  # 半长轴
@@ -63,40 +63,39 @@ def generate_ellipse_mesh(output_filename="SqrCirc.msh"):
     factory.addPoint(Centx, Centy, 0, lc1, 109)  # 中心点
 
     # 注意点的顺序和弧的定义
-    factory.addEllipseArc(106, 109, 105, 105,301)  # 从右顶点到上顶点
-    factory.addEllipseArc(105, 109, 107, 107,302)  # 从上顶点到左顶点
-    factory.addEllipseArc(107, 109, 108, 108,303)  # 从左顶点到下顶点
-    factory.addEllipseArc(108, 109, 106, 106,304)  # 从下顶点到右顶点
-
-    factory.addCurveLoop([301, 302, 303, 304], 310)
+    factory.addEllipseArc(106, 109, 105, 105,105)  # 从右顶点到上顶点
+    factory.addEllipseArc(105, 109, 107, 107,106)  # 从上顶点到左顶点
+    factory.addEllipseArc(107, 109, 108, 108,107)  # 从左顶点到下顶点
+    factory.addEllipseArc(108, 109, 106, 106,108)  # 从下顶点到右顶点
+    factory.addCurveLoop([105, 106, 107, 108], 109)
 
     # 将生成的图形（点、线、面等）组装起来
-    factory.addPlaneSurface([10, 210, 310], 320)
-    factory.addPlaneSurface([210], 330)
-    factory.addPlaneSurface([310], 340)
+    factory.addPlaneSurface([10, 9, 109], 10)
+    factory.addPlaneSurface([9], 11)
+    factory.addPlaneSurface([109], 12)
 
     factory.synchronize()
 
     # 创建物理组 将 创建的 点 线 面等的tag可以加入物理组
     # dim 维度 点 线 面
     # tags 包含要添加到物理组中的模型实体的标签（tag）
-    top_physical_group = gmsh.model.addPhysicalGroup(1, [5])
+    top_physical_group = gmsh.model.addPhysicalGroup(1, [1])
     gmsh.model.setPhysicalName(1, top_physical_group, "Top")
 
-    left_physical_group = gmsh.model.addPhysicalGroup(1, [8])
+    left_physical_group = gmsh.model.addPhysicalGroup(1, [2])
     gmsh.model.setPhysicalName(1, left_physical_group, "Left")
 
-    right_physical_group = gmsh.model.addPhysicalGroup(1, [6])
+    right_physical_group = gmsh.model.addPhysicalGroup(1, [4])
     gmsh.model.setPhysicalName(1, right_physical_group, "Right")
 
-    bottom_physical_group = gmsh.model.addPhysicalGroup(1, [7])
+    bottom_physical_group = gmsh.model.addPhysicalGroup(1, [3])
     gmsh.model.setPhysicalName(1, bottom_physical_group, "Bottom")
 
     # 2. 椭圆形区域的物理组，实际上为圆形内的单元指定不同的属性
-    circle_physical_group = gmsh.model.addPhysicalGroup(2, [320])
+    circle_physical_group = gmsh.model.addPhysicalGroup(2, [10])
     gmsh.model.setPhysicalName(2, circle_physical_group, "M1")
 
-    sc_physical_group = gmsh.model.addPhysicalGroup(2, [330, 340])
+    sc_physical_group = gmsh.model.addPhysicalGroup(2, [11, 12])
     gmsh.model.setPhysicalName(2, sc_physical_group, "M2")
 
     # 生成四边形网格
