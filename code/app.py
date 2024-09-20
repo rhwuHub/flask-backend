@@ -45,7 +45,7 @@ def execute_ssh_command(ssh, command):
 
 # 登录并执行所需操作
 def login_operation():
-    config_file = '/app/config.txt'  # 根据环境（docker/本地）调整路径
+    config_file = '../config.txt'  # 根据环境（docker/本地）调整路径
     config = load_config(config_file)
 
     ssh = paramiko.SSHClient()
@@ -90,17 +90,14 @@ def login_operation():
             logging.error('Shell 脚本执行失败')
 
         #     生成gif
-        create_gif_from_images('/app/OUTPUT_FILES','/app/OUTPUT_FILES/output.gif')
+        # create_gif_from_images('/data/specfem2d/my-gmsh-data/data/gmshtest/OUTPUT_FILES','/data/specfem2d/my-gmsh-data/data/gmshtest/OUTPUT_FILES/output.gif')
         logging.info('生成Gif成功')
     finally:
         ssh.close()
 
 def sqrCirc():
-    mesh_generator.generate_circle_mesh()
-    # mesh_generator.generate_ellipse_mesh()
-
-
-
+    # mesh_generator.generate_circle_mesh()
+    mesh_generator.generate_ellipse_mesh()
 
 # 调用方法的示例：将图片生成gif
 # create_gif_from_images('/data/picture', '/data/picture/output.gif')
