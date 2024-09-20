@@ -71,9 +71,11 @@ def container_operation():
     create_gif_from_images(f'{GMSHTEST_PATH}/OUTPUT_FILES',f'{GMSHTEST_PATH}/OUTPUT_FILES/output.gif')
     logging.info('生成Gif成功')
 
-def sqrCirc():
-    mesh_generator.generate_circle_mesh()
-    # mesh_generator.generate_ellipse_mesh()
+def sqrCirc(shape_type):
+    if shape_type == 'circle':
+        mesh_generator.generate_circle_mesh()  # 调用生成圆形网格的函数
+    elif shape_type == 'ellipse':
+        mesh_generator.generate_ellipse_mesh()  # 调用生成椭圆网格的函数
 
 
 
@@ -125,7 +127,16 @@ def create_gif_from_images(image_dir, output_gif,max_size=(800,800)):
 @app.route('/test_update', methods=['POST'])
 def test():
     data = request.json
-    sqrCirc()
+    # 根据 shape 参数决定调用哪个函数
+    if 'shape' in data:
+        if data['shape'] == 'circle':
+            sqrCirc('circle')
+        elif data['shape'] == 'ellipse':
+            sqrCirc('ellipse')
+        else:
+            return jsonify({"error": "Invalid shape type"}), 400
+    else:
+        return jsonify({"error": "Shape not specified"}), 400
     container_operation()
     return jsonify({"received_data": data}), 200
 
