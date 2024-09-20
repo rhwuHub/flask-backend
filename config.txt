@@ -1,4 +1,0 @@
-# gmshtest目录的位置
-GMSHTEST_PATH=/app/gmshtest
-# LibGmsh2Specfem_convert_Gmsh_to_Specfem2D_official.py的位置
-LibGmsh2Specfem_PATH=/app/specfem2d/utils/Gmsh
