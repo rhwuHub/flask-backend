@@ -54,9 +54,6 @@ RUN make
 # 返回到 /app 目录
 WORKDIR /app
 
-# 给脚本文件增加执行权限
-RUN chmod +x /app/gmshtest/run_this_example.sh
-
 # 创建虚拟环境
 RUN python3.11 -m venv /env
 
