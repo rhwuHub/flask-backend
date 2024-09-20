@@ -106,8 +106,7 @@ def generate_ellipse_mesh(output_filename="SqrCirc.msh"):
     # 保存网格为 .msh 文件
     gmsh.write(os.path.join(output_dir, output_filename))
 
-    # 终止 Gmsh
-    gmsh.finalize()
+
 
 # 生成圆
 def generate_circle_mesh(output_filename="SqrCirc.msh"):
@@ -206,5 +205,3 @@ def generate_circle_mesh(output_filename="SqrCirc.msh"):
         os.makedirs(output_dir)
     # 保存网格为 .msh 文件   /app/gmshtest/MESH/SqrCirc.msh
     gmsh.write(os.path.join(output_dir, output_filename))
-    # 终止 Gmsh
-    gmsh.finalize()
