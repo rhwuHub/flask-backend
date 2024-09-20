@@ -18,21 +18,20 @@ def initialize_gmsh():
         logging.info("Gmsh initialized")
 
 # 从文件加载配置
-# 从文件加载配置
-def load_config(filename):
-    config = {}
-    try:
-        with open(filename, 'r',encoding='utf-8') as file:
-            for line in file:
-                # 忽略以 # 开头的注释行
-                if line.strip().startswith("#") or not line.strip():
-                    continue
-                key, value = line.strip().split('=', 1)
-                config[key] = value
-    except FileNotFoundError as e:
-        logging.error(f"配置文件未找到: {e}")
-        raise
-    return config
+# def load_config(filename):
+#     config = {}
+#     try:
+#         with open(filename, 'r',encoding='utf-8') as file:
+#             for line in file:
+#                 # 忽略以 # 开头的注释行
+#                 if line.strip().startswith("#") or not line.strip():
+#                     continue
+#                 key, value = line.strip().split('=', 1)
+#                 config[key] = value
+#     except FileNotFoundError as e:
+#         logging.error(f"配置文件未找到: {e}")
+#         raise
+#     return config
 
 # 执行linux命令
 def execute_command(command):
@@ -51,10 +50,11 @@ def execute_command(command):
 
 # 登录并执行所需操作
 def container_operation():
-    config_file = '/app/config.txt'  # 根据环境（docker/本地）调整路径
-    config = load_config(config_file)
+    # config_file = '/app/config.txt'  # 根据环境（docker/本地）调整路径
+    # config = load_config(config_file)
     # 复制 SqrCirc.msh 文件 到 MESH 中
-    GMSHTEST_PATH = config['GMSHTEST_PATH']
+    # GMSHTEST_PATH = config['GMSHTEST_PATH']
+    GMSHTEST_PATH = '/app/gmshtest'
     # 生成网格文件
     LibGmsh2Specfem_PATH = '/app/specfem2d/utils/Gmsh'
     # 执行 Python 脚本
