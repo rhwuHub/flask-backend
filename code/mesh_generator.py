@@ -1,4 +1,6 @@
 # mesh_generator.py
+import ast
+import logging
 
 import gmsh
 import os
@@ -115,14 +117,26 @@ def generate_ellipse_mesh(output_filename="SqrCirc.msh"):
 
 
 
+
 # 生成圆
-def generate_circle_mesh(output_filename="SqrCirc.msh"):
+def generate_circle_mesh(
+    output_filename="SqrCirc.msh",
+    length=2.0, width=2.0,  # 矩形尺寸
+    lc1=0.1,  # 网格尺寸
+    big_circle_radius=0.2, big_circle_center=(0.25, 0),  # 大圆参数
+    small_circle_radius=0.1, small_circle_center=(-0.25, 0),  # 小圆参数
+    mesh_algorithm=8,  # 网格算法
+    element_order=2,  # 单元阶数
+    characteristic_length_factor=0.8  # 特征长度因子
+):
+    big_circle_center = ast.literal_eval(big_circle_center)  # 解析成元组
+    small_circle_center = ast.literal_eval(small_circle_center)  # 解析成元组
     gmsh.model.add("t4")
 
     # 定义矩形的尺寸
-    length = 2.0
-    width = 2.0
-    lc1 = 0.1
+    # length = 2.0
+    # width = 2.0
+    # lc1 = 0.1
 
     factory = gmsh.model.geo
 
@@ -141,9 +155,9 @@ def generate_circle_mesh(output_filename="SqrCirc.msh"):
     # factory.addPlaneSurface([1], 1)
 
     # add a big circle
-    R = 0.2
-    Centx = 0.25
-    Centy = 0
+    R = big_circle_radius
+    Centx = big_circle_center[0]
+    Centy = big_circle_center[1]
     factory.addPoint(Centx, R + Centy, 0, lc1, 5)
     factory.addPoint(R + Centx, Centy, 0, lc1, 6)
     factory.addPoint(-R + Centx, Centy, 0, lc1, 7)
@@ -156,9 +170,9 @@ def generate_circle_mesh(output_filename="SqrCirc.msh"):
     factory.addCurveLoop([5, 6, 7, 8], 9)
 
     # add a small circle
-    R = 0.1
-    Centx = -0.25
-    Centy = 0
+    R = small_circle_radius
+    Centx = small_circle_center[0]
+    Centy = small_circle_center[1]
     factory.addPoint(Centx, R + Centy, 0, lc1, 105)
     factory.addPoint(R + Centx, Centy, 0, lc1, 106)
     factory.addPoint(-R + Centx, Centy, 0, lc1, 107)
@@ -199,16 +213,35 @@ def generate_circle_mesh(output_filename="SqrCirc.msh"):
     gmsh.model.setPhysicalName(2, sc_physical_group, "M2")
 
     # 生成四边形网格
-    gmsh.option.setNumber("Mesh.Algorithm", 8)  # 使用四边形网格生成算法
+    gmsh.option.setNumber("Mesh.Algorithm", mesh_algorithm)  # 使用四边形网格生成算法
     # gmsh.option.setNumber("Mesh.RecombineAll", 1)  # 强制使用四边形网格
-    gmsh.option.setNumber("Mesh.ElementOrder", 2)  # 使用一阶网格
+    gmsh.option.setNumber("Mesh.ElementOrder", element_order)  # 使用一阶网格
     gmsh.option.setNumber("Mesh.SubdivisionAlgorithm", 1)
     gmsh.option.setNumber("Mesh.RecombinationAlgorithm", 2)
-    gmsh.option.setNumber("Mesh.CharacteristicLengthFactor", 0.8)
+    gmsh.option.setNumber("Mesh.CharacteristicLengthFactor", characteristic_length_factor)
     gmsh.option.setNumber("Mesh.MshFileVersion", 2.2)
     gmsh.model.mesh.generate(2)
+    # gmsh.fltk.run()  # 启动可视化窗口
     output_dir = "gmshtest/MESH"
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     # 保存网格为 .msh 文件   /app/gmshtest/MESH/SqrCirc.msh
     gmsh.write(os.path.join(output_dir, output_filename))
+
+# 初始化 GMSH
+def initialize_gmsh():
+    if not gmsh.isInitialized():
+        gmsh.initialize()  # 确保 GMSH 只在主线程中初始化
+        logging.info("Gmsh initialized")
+
+if __name__ == '__main__':
+    if not gmsh.isInitialized():
+        initialize_gmsh()
+    generate_circle_mesh(length=3.0, width=2.0,  # 矩形尺寸
+    lc1=0.1,  # 网格尺寸
+    big_circle_radius=0.2, big_circle_center=(0.25, 0),  # 大圆参数
+    small_circle_radius=0.1, small_circle_center=(-0.25, 0),  # 小圆参数
+    mesh_algorithm=8,  # 网格算法
+    element_order=2,  # 单元阶数
+    characteristic_length_factor=0.8)
+    # generate_ellipse_mesh()

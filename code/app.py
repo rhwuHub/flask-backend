@@ -11,6 +11,23 @@ app = Flask(__name__)
 # 设置日志
 logging.basicConfig(level=logging.INFO)
 
+class MeshConfig:
+    def __init__(self, length=3.0, width=2.0, lc1=0.1,
+                 big_circle_radius=0.2, big_circle_center=(0.25, 0),
+                 small_circle_radius=0.1, small_circle_center=(-0.25, 0),
+                 mesh_algorithm=8, element_order=2, characteristic_length_factor=0.8,shape='circle'):
+        self.length = length
+        self.width = width
+        self.lc1 = lc1
+        self.big_circle_radius = big_circle_radius
+        self.big_circle_center = big_circle_center
+        self.small_circle_radius = small_circle_radius
+        self.small_circle_center = small_circle_center
+        self.mesh_algorithm = mesh_algorithm
+        self.element_order = element_order
+        self.characteristic_length_factor = characteristic_length_factor
+        self.shape = shape
+
 # 初始化 GMSH
 def initialize_gmsh():
     if not gmsh.isInitialized():
@@ -50,9 +67,16 @@ def container_operation():
     create_gif_from_images(f'{GMSHTEST_PATH}/OUTPUT_FILES',f'{GMSHTEST_PATH}/OUTPUT_FILES/output.gif')
     logging.info('生成Gif成功')
 
-def sqrCirc(shape_type):
+def sqrCirc(shape_type,config):
     if shape_type == 'circle':
-        mesh_generator.generate_circle_mesh()  # 调用生成圆形网格的函数
+        mesh_generator.generate_circle_mesh( output_filename="SqrCirc.msh",
+    length=config.length, width=config.width,  # 矩形尺寸
+    lc1=config.lc1,  # 网格尺寸
+    big_circle_radius=config.big_circle_radius, big_circle_center=config.big_circle_center,  # 大圆参数
+    small_circle_radius=config.small_circle_radius, small_circle_center=config.small_circle_center,  # 小圆参数
+    mesh_algorithm=config.mesh_algorithm,  # 网格算法
+    element_order=config.element_order,  # 单元阶数
+    characteristic_length_factor=config.characteristic_length_factor)  # 调用生成圆形网格的函数
     elif shape_type == 'ellipse':
         mesh_generator.generate_ellipse_mesh()  # 调用生成椭圆网格的函数
 
@@ -100,18 +124,16 @@ def create_gif_from_images(image_dir, output_gif,max_size=(800,800)):
 @app.route('/test_update', methods=['POST'])
 def test():
     data = request.json
+    config = MeshConfig(**data)  # 反序列化 JSON 为对象
     # 根据 shape 参数决定调用哪个函数
-    if 'shape' in data:
-        if data['shape'] == 'circle':
-            sqrCirc('circle')
-        elif data['shape'] == 'ellipse':
-            sqrCirc('ellipse')
-        else:
-            return jsonify({"error": "Invalid shape type"}), 400
+    if config.shape == 'circle':
+        sqrCirc('circle',config)
+    elif config.shape == 'ellipse':
+        sqrCirc('ellipse',config)
     else:
-        return jsonify({"error": "Shape not specified"}), 400
+        return jsonify({"error": "Invalid shape type"}), 400
     container_operation()
-    return jsonify({"received_data": data}), 200
+    return jsonify({"message": "success"}), 200
 
 
 # 定义一个路由来发送图片文件
