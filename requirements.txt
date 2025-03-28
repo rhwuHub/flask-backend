@@ -1,5 +1,0 @@
-# requirements.txt
-flask
-gmsh
-Pillow
-numpy

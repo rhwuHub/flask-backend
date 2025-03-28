@@ -3,7 +3,7 @@ name: Build and Push Docker Image to Aliyun
 on:
   push:
     branches:
-      - gm-update-specfem2D  # 当 gm-update-specfem2D 分支有代码推送时触发
+      - custom_mirror  # 当 custom_mirror 分支有代码推送时触发
 
 jobs:
   build-and-push:
@@ -31,4 +31,4 @@ jobs:
           context: .  # Dockerfile 所在的上下文路径，当前目录为根目录
           file: ./Dockerfile  # Dockerfile 的路径，相对于 context
           push: true
-          tags: registry.cn-hangzhou.aliyuncs.com/rhwu/hub:gm-update-specfem2D  # 替换为你的镜像仓库地址和标签
+          tags: registry.cn-hangzhou.aliyuncs.com/rhwu/hub:python3.9-vllm-fin-r1  # 替换为你的镜像仓库地址和标签
