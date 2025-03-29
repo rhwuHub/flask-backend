@@ -12,7 +12,6 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-ENV TMPDIR=/home/runner/work/tmp
 # 安装 vLLM
 RUN pip install --upgrade pip && pip install --no-cache-dir vllm
 

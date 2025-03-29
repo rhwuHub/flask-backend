@@ -24,10 +24,21 @@ jobs:
         run: docker login --username=${{ secrets.ALIYUN_REGISTRY_USERNAME }} --password=${{ secrets.ALIYUN_REGISTRY_PASSWORD }} registry.cn-hangzhou.aliyuncs.com
         # 登录阿里云 Docker 镜像仓库，使用 GitHub secrets 中的用户名和密码
 
-      - name: Set the TMPDIR to utilize more space.
-        run: |
-          export TMPDIR=/home/runner/work/tmp
-          mkdir -p $TMPDIR
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          # this might remove tools that are actually needed,
+          # if set to "true" but frees about 6 GB
+          tool-cache: false
+
+          # all of these default to true, but feel free to set to
+          # "false" if necessary for your workflow
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
 
       - name: Build and push image
         id: docker_build
