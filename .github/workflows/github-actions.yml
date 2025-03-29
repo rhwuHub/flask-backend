@@ -24,6 +24,13 @@ jobs:
         run: docker login --username=${{ secrets.ALIYUN_REGISTRY_USERNAME }} --password=${{ secrets.ALIYUN_REGISTRY_PASSWORD }} registry.cn-hangzhou.aliyuncs.com
         # 登录阿里云 Docker 镜像仓库，使用 GitHub secrets 中的用户名和密码
 
+      - name: clear
+        run: |
+          sudo apt-get clean
+          sudo rm -rf /var/lib/apt/lists/*
+          sudo rm -rf /usr/local/lib/android
+          docker system prune -af
+
       - name: Build and push image
         id: docker_build
         uses: docker/build-push-action@v5
