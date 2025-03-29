@@ -1,5 +1,5 @@
 # 使用 PyTorch 官方提供的 CUDA 镜像
-FROM pytorch/pytorch:2.1.0-cuda12.1-cudnn8-runtime
+FROM pytorch/pytorch:2.6.0-cuda12.4-cudnn9-runtime
 
 # 设置环境变量，避免 Python 生成 .pyc 文件
 ENV PYTHONUNBUFFERED=1
