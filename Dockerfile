@@ -1,5 +1,5 @@
-# 使用 Python 3.9 作为基础镜像
-FROM python:3.9
+# 使用 PyTorch 官方提供的 CUDA 镜像
+FROM pytorch/pytorch:2.1.0-cuda12.1-cudnn8-runtime
 
 # 设置环境变量，避免 Python 生成 .pyc 文件
 ENV PYTHONUNBUFFERED=1
@@ -12,12 +12,8 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# 安装 CUDA 相关依赖（如果使用 GPU）
-RUN pip install --upgrade pip
-RUN pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-
 # 安装 vLLM
-RUN pip install vllm
+RUN pip install --upgrade pip && pip install vllm
 
 # 设置工作目录
 WORKDIR /app
