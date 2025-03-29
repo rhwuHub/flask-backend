@@ -26,7 +26,7 @@ jobs:
 
       - name: Set the TMPDIR to utilize more space.
         run: |
-          export TMPDIR=/mnt/tmp
+          export TMPDIR=/home/runner/work/tmp
           mkdir -p $TMPDIR
 
       - name: Build and push image
