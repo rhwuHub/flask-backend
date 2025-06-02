@@ -10,7 +10,7 @@ LABEL org.opencontainers.image.licenses = "Apache License 2.0"
 # Set the working directory
 WORKDIR /workspace/InspireMusic
 # Copy the current directory contents into the container at /workspace/InspireMusic
-git clone https://github.com/FunAudioLLM/InspireMusic.git
+RUN git clone https://github.com/FunAudioLLM/InspireMusic.git
 
 # inatall library dependencies
 RUN apt-get update && apt-get install -y ffmpeg sox libsox-dev git && apt-get clean
