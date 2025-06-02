@@ -1,29 +1,20 @@
-# 使用 PyTorch 官方提供的 CUDA 镜像
-FROM pytorch/pytorch:2.6.0-cuda12.4-cudnn9-runtime
+# Use PyTorch 2.6 GPU base image with Python 3.11 and CUDA 12.1/12.4 on Ubuntu 22.04
+FROM nvcr.io/nvidia/pytorch:24.08-py3
 
-# 设置环境变量，避免 Python 生成 .pyc 文件
-ENV PYTHONUNBUFFERED=1
+ENV DEBIAN_FRONTEND=noninteractive
 
-# 安装必要的软件包
-RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    wget \
-    ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+# metainformation
+LABEL org.opencontainers.image.source = "https://github.com/FunAudioLLM/InspireMusic"
+LABEL org.opencontainers.image.licenses = "Apache License 2.0"
 
-# 安装 vLLM
-RUN pip install --upgrade pip && pip install --no-cache-dir vllm
+# Set the working directory
+WORKDIR /workspace/InspireMusic
+# Copy the current directory contents into the container at /workspace/InspireMusic
+git clone https://github.com/FunAudioLLM/InspireMusic.git
 
+# inatall library dependencies
+RUN apt-get update && apt-get install -y ffmpeg sox libsox-dev git && apt-get clean
+RUN pip install -r requirements.txt
 
-# 设置工作目录
-WORKDIR /app
-
-# 复制项目文件（如果有）
-COPY . /app
-
-# 暴露端口
-EXPOSE 8000
-
-# 运行 vLLM 服务
-#CMD ["vllm", "serve", "/app/Fin-R1", "--host", "0.0.0.0", "--port", "8000", "--gpu-memory-utilization", "0.9", "--max-model-len", "16384", "--tensor-parallel-size", "2", "--served-model-name", "Fin-R1"]
+# install flash attention
+RUN pip install flash-attn
